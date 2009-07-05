@@ -32,6 +32,8 @@ class SplObjectMap extends SplObjectStorage implements ArrayAccess {
 }
 
 interface CLIWrapper {
+  const SKIP_VERIFY = 0x001;
+  const SKIP_BUILD = 0x002;
   public function getWorkingPath();
 }
 
@@ -39,6 +41,17 @@ interface CLIWrapperConfig {
   public function getWorkingPath();
   public function getPrependPath();
   public function attachWrapper(CLIWrapper &$wrapper);
+  /**
+   * Returns an array of environment variables.
+   *
+   * This function is primarily intended for use by proc handlers' calls to
+   * proc_open(); implementations of CLIWrapperConfig should always ensure that
+   * the array returned from this method represents the current set of
+   * environment variables to be used.
+   *
+   * @return array
+   */
+  public function getEnv();
 }
 
 interface CLICommand {
@@ -55,6 +68,7 @@ interface CLICommand {
   public function prepare();
   public function execute();
   public function attachProcHandler(CLIProcHandler $proc);
+  public function getShellString();
 }
 
 interface CLICommandOpt {

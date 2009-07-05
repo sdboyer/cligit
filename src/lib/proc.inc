@@ -233,15 +233,7 @@ abstract class ProcHandlerGeneric implements CLIProcHandler {
       }
     }
 
-    $exit = proc_close($this->process);
-    if ($exit !== 0) {
-      $text = "Invocation of command '{$this->command->getShellString()}' failed with exit code $exit";
-      // if ($this->io[2] instanceof ProcIO && $stderr = (string) $this->io[2]) {
-      if (!empty($this->ret[2])) {
-        $text .= " and the following stderr output: '{$this->ret[2]}'";
-      }
-      throw new RuntimeException($text, E_RECOVERABLE_ERROR);
-    }
+    return proc_close($this->process);
   }
 
   public function execute($fds = array()) {
@@ -266,5 +258,19 @@ class CLIProcHandlerSingle extends ProcHandlerGeneric {
       2 => &$this->outputs[2],
     );
     // $this->outputs[2]->connectIn($this->pipes[2]);
+  }
+}
+
+class CLIProcHandlerExitSensitive extends ProcHandlerGenericSingle {
+
+  public function procClose() {
+    $exit = parent::procClose();
+    if ($exit !== 0) {
+      $text = "Invocation of command '{$this->command->getShellString()}' failed with exit code $exit";
+      if (!empty($this->ret[2])) {
+        $text .= " and the following stderr output: '{$this->ret[2]}'";
+      }
+      throw new RuntimeException($text, E_RECOVERABLE_ERROR);
+    }
   }
 }
