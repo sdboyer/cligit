@@ -30,7 +30,7 @@ abstract class GitCommand implements CLICommand {
     return $this;
   }
 
-  public function prepare($fluent = TRUE) {
+  public function prepare() {
     $this->internalSwitches |= self::PREPARED;
     $cmds = array();
 
@@ -46,7 +46,7 @@ abstract class GitCommand implements CLICommand {
     asort($opts, SORT_NUMERIC);
     $cmds = array_merge($cmds, array_keys($opts));
     array_unshift($cmds, 'git', $this->command);
-    return $fluent ? $this : $cmds;
+    return $cmds;
   }
 
   /**
@@ -80,7 +80,7 @@ abstract class GitCommand implements CLICommand {
 
   public function getShellString() {
     if (!($this->internalSwitches & self::PREPARED)) {
-      $this->shellString = implode(' ', $this->prepare(FALSE));
+      $this->shellString = implode(' ', $this->prepare());
     }
     return $this->shellString;
   }
